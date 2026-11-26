@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2f7d6d">
+<title>Casa en Orden</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--bg:#fbf7f1;--card:#fff;--ink:#2b2b2b;--muted:#7a7268;--line:#ece4d8;--pri:#2f7d6d;--pri-soft:#e3f1ed;--warn:#c8553d;--warn-soft:#fbe9e4;--gold:#e9a23b;--fs:18px}
+body.grande{--fs:21px}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font:var(--fs)/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);padding-bottom:90px;-webkit-tap-highlight-color:transparent}
+header{background:var(--pri);color:#fff;padding:16px;padding-top:calc(16px + env(safe-area-inset-top))}
+header h1{margin:0;font-size:1.3em}
+header p{margin:2px 0 0;opacity:.9;font-size:.85em}
+main{padding:14px 16px;max-width:640px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:14px}
+.card h2{margin:0 0 10px;font-size:1.05em}
+.muted{color:var(--muted);font-size:.85em}
+nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:5}
+nav button{flex:1;border:0;background:none;padding:8px 2px 10px;font:inherit;font-size:.68em;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px;position:relative}
+nav button .ic{font-size:1.7em;line-height:1.1}
+nav button.on{color:var(--pri);font-weight:700}
+.badge{position:absolute;top:3px;left:calc(50% + 8px);background:var(--warn);color:#fff;border-radius:10px;font-size:.9em;padding:0 6px;min-width:18px;font-weight:700}
+.item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.item:last-child{border-bottom:0}
+.chk{width:30px;height:30px;accent-color:var(--pri);flex:none;margin:0}
+.item .txt{flex:1;word-break:break-word}
+.item.done .txt{text-decoration:line-through;color:var(--muted)}
+.tag{font-size:.7em;background:var(--pri-soft);color:var(--pri);border-radius:8px;padding:1px 6px;margin-left:4px;white-space:nowrap}
+.ibtn{border:0;background:none;font-size:1.05em;padding:6px;color:var(--muted);flex:none}
+.add{display:flex;gap:8px;margin-bottom:6px}
+input[type=text],input[type=date],textarea,select{font:inherit;width:100%;padding:11px 12px;border:1px solid #ddd3c4;border-radius:12px;background:#fff;color:var(--ink)}
+textarea{min-height:80px;resize:vertical}
+label.f{display:block;font-size:.85em;color:var(--muted);margin:10px 0 4px}
+.btn{font:inherit;border:0;border-radius:12px;padding:11px 16px;background:var(--pri);color:#fff;font-weight:600;flex:none}
+.btn.sec{background:var(--pri-soft);color:var(--pri)}
+.btn.warn{background:var(--warn-soft);color:var(--warn)}
+.btn.block{width:100%;margin-top:8px}
+.btn.sm{padding:6px 10px;font-size:.8em}
+.days{display:flex;gap:8px;overflow-x:auto;margin-bottom:14px;padding-bottom:2px}
+.day{flex:none;border:1px solid var(--line);background:#fff;border-radius:12px;padding:6px 12px;text-align:center;font:inherit;font-size:.8em;color:var(--ink);line-height:1.25}
+.day.on{background:var(--pri);color:#fff;border-color:var(--pri)}
+.alert{background:var(--warn-soft);color:var(--warn);border-radius:14px;padding:12px 14px;margin-bottom:14px}
+.ok{background:var(--pri-soft);color:var(--pri);border-radius:14px;padding:14px;text-align:center}
+.bar{height:10px;background:var(--line);border-radius:6px;overflow:hidden;margin:4px 0 8px}
+.bar i{display:block;height:100%;background:var(--pri);border-radius:6px;transition:width .3s}
+.meal{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px dashed var(--line);cursor:pointer}
+.meal:last-child{border-bottom:0}
+.meal .lbl{width:6.2em;flex:none;color:var(--muted);font-size:.85em}
+.meal .dish{flex:1}
+.meal .dish.empty{color:#b9ae9f;font-style:italic}
+.meal .ing{display:block;font-size:.75em;color:var(--muted)}
+.dayhead{display:flex;justify-content:space-between;align-items:center}
+.today-card{border:2px solid var(--pri)}
+.weeknav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.weeknav b{font-size:.95em}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chips label{display:inline-flex}
+.chips input{display:none}
+.chips span{border:1px solid #ddd3c4;border-radius:10px;padding:6px 10px;font-size:.85em;background:#fff}
+.chips input:checked+span{background:var(--pri);color:#fff;border-color:var(--pri)}
+.row{display:flex;gap:8px;margin-top:14px}
+.row .btn{flex:1}
+.statrow{display:flex;align-items:center;gap:10px;font-size:.85em;padding:4px 0}
+.statrow span:first-child{width:7.5em;flex:none}
+.statrow .bar{flex:1;margin:0}
+.statrow span:last-child{width:3em;text-align:right;flex:none}
+#modal{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:flex-end;justify-content:center;z-index:20}
+#modal[hidden]{display:none}
+.sheet{background:#fff;width:100%;max-width:640px;border-radius:20px 20px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));max-height:90vh;overflow:auto}
+.sheet h2{margin:0 0 6px;font-size:1.1em}
+.empty-msg{color:var(--muted);text-align:center;padding:14px 0;font-size:.9em}
+#toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 16px;border-radius:12px;font-size:.85em;opacity:0;transition:opacity .25s;pointer-events:none;z-index:30;max-width:90%}
+#toast.show{opacity:1}
+</style>
+</head>
+<body>
+<header><h1 id="htitle">Casa en Orden</h1><p id="hsub"></p></header>
+<main id="main"></main>
+<nav id="nav">
+  <button data-tab="hoy"><span class="ic">🏠</span>Hoy</button>
+  <button data-tab="menu"><span class="ic">🍽️</span>Menú</button>
+  <button data-tab="compras"><span class="ic">🛒</span>Compras</button>
+  <button data-tab="pend"><span class="ic">⏰</span>Pendientes</button>
+  <button data-tab="mas"><span class="ic">⚙️</span>Más</button>
+</nav>
+<div id="modal" hidden></div>
+<div id="toast"></div>
+
+<script>
+const KEY='casa-en-orden-v1';
+const DIAS=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+const MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const COMIDAS=[['desayuno','☕ Desayuno'],['almuerzo','🍲 Almuerzo'],['cena','🌙 Cena']];
+
+function defaults(){return{tasks:[],routines:[],menu:{},shop:[],gen:{},dishes:{},grande:false,seeded:false}}
+function load(){try{return Object.assign(defaults(),JSON.parse(localStorage.getItem(KEY)||'{}'))}catch(e){return defaults()}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+let S=load(), tab='hoy', selDate=today(), weekOffset=0;
+
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+function ds(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function today(){return ds(new Date())}
+function parse(s){const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)}
+function addDays(s,n){const d=parse(s);d.setDate(d.getDate()+n);return ds(d)}
+function nice(s){const d=parse(s);return DIAS[d.getDay()]+' '+d.getDate()+' de '+MESES[d.getMonth()]}
+function rel(s){const t=today();if(s===t)return'Hoy';if(s===addDays(t,1))return'Mañana';if(s===addDays(t,-1))return'Ayer';return nice(s)}
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('show'),1800)}
+
+// ---------- datos ----------
+if(!S.seeded){
+  S.tasks.push({id:uid(),text:'👋 Toca la casilla cuando termines una tarea',date:today(),done:false});
+  S.tasks.push({id:uid(),text:'Toca el texto de una tarea para cambiarla',date:today(),done:false});
+  S.seeded=true;save();
+}
+function genRoutines(date){
+  if(date<today())return;
+  const wd=parse(date).getDay();let ch=false;
+  S.routines.forEach(r=>{const k=date+'|'+r.id;if(r.days.includes(wd)&&!S.gen[k]){S.tasks.push({id:uid(),text:r.text,date,done:false,fixed:true});S.gen[k]=1;ch=true}});
+  if(ch)save();
+}
+const pendientes=()=>S.tasks.filter(t=>!t.done&&t.date<today()).sort((a,b)=>b.date.localeCompare(a.date));
+const task=id=>S.tasks.find(t=>t.id===id);
+function addToShop(items){
+  let n=0;
+  items.map(x=>x.trim()).filter(Boolean).forEach(x=>{
+    if(!S.shop.some(s=>!s.done&&s.text.toLowerCase()===x.toLowerCase())){S.shop.push({id:uid(),text:x,done:false});n++}
+  });
+  return n;
+}
+
+// ---------- vistas ----------
+function itemTask(t,mode){
+  const fixed=t.fixed?'<span class="tag">fija</span>':'';
+  if(mode==='pend') return `<div class="item"><input type="checkbox" class="chk" data-act="toggle" data-id="${t.id}"><span class="txt" data-act="editTask" data-id="${t.id}">${esc(t.text)}${fixed}</span><button class="btn sec sm" data-act="toToday" data-id="${t.id}">→ Hoy</button></div>`;
+  return `<div class="item ${t.done?'done':''}"><input type="checkbox" class="chk" data-act="toggle" data-id="${t.id}" ${t.done?'checked':''}><span class="txt" data-act="editTask" data-id="${t.id}">${esc(t.text)}${fixed}</span><button class="ibtn" data-act="delTask" data-id="${t.id}" aria-label="Borrar">🗑️</button></div>`;
+}
+function mealRows(date){
+  const m=S.menu[date]||{};
+  return COMIDAS.map(([k,l])=>{
+    const v=m[k]||{};
+    return `<div class="meal" data-act="editMeal" data-date="${date}" data-k="${k}"><span class="lbl">${l}</span><span class="dish ${v.name?'':'empty'}">${v.name?esc(v.name):'Tocar para elegir…'}${v.ing?`<span class="ing">🧺 ${esc(v.ing)}</span>`:''}</span><span>✏️</span></div>`;
+  }).join('');
+}
+
+function vHoy(){
+  genRoutines(selDate);
+  const t=today();
+  const list=S.tasks.filter(x=>x.date===selDate).sort((a,b)=>a.done-b.done);
+  const done=list.filter(x=>x.done).length, pct=list.length?Math.round(done/list.length*100):0;
+  const pend=pendientes().length;
+  let h='';
+  if(pend&&selDate===t)h+=`<div class="alert" data-act="go" data-tab="pend">⚠️ Tienes <b>${pend}</b> ${pend==1?'cosa':'cosas'} sin hacer de días anteriores. <u>Ver</u></div>`;
+  h+='<div class="days">';
+  for(let i=0;i<7;i++){const d=addDays(t,i);h+=`<button class="day ${d===selDate?'on':''}" data-act="day" data-date="${d}"><b>${i==0?'Hoy':i==1?'Mañana':DIAS[parse(d).getDay()].slice(0,3)}</b><br>${parse(d).getDate()}</button>`}
+  h+='</div>';
+  h+=`<div class="card"><h2>🍽️ ¿Qué cocino ${selDate===t?'hoy':selDate===addDays(t,1)?'mañana':'el '+DIAS[parse(selDate).getDay()].toLowerCase()}?</h2>${mealRows(selDate)}</div>`;
+  h+=`<div class="card"><h2>✅ Cosas por hacer · ${rel(selDate)}</h2>`;
+  if(list.length)h+=`<div class="muted">${done} de ${list.length} hechas${pct===100?' 🎉 ¡Muy bien!':''}</div><div class="bar"><i style="width:${pct}%"></i></div>`;
+  h+=`<form class="add" data-form="addTask"><input type="text" name="t" placeholder="Agregar algo que hacer…" autocomplete="off"><button class="btn">＋</button></form>`;
+  h+=list.length?list.map(x=>itemTask(x)).join(''):'<div class="empty-msg">Nada anotado para este día todavía.</div>';
+  h+='</div>';
+  return h;
+}
+
+function weekStart(){const d=new Date();const wd=(d.getDay()+6)%7;d.setDate(d.getDate()-wd+weekOffset*7);return ds(d)}
+function vMenu(){
+  const ws=weekStart(), t=today();
+  const lbl=weekOffset===0?'Esta semana':weekOffset===1?'Próxima semana':weekOffset===-1?'Semana pasada':`${parse(ws).getDate()} ${MESES[parse(ws).getMonth()].slice(0,3)} – ${parse(addDays(ws,6)).getDate()} ${MESES[parse(addDays(ws,6)).getMonth()].slice(0,3)}`;
+  let h=`<div class="weeknav"><button class="btn sec sm" data-act="week" data-d="-1">◀ Antes</button><b>${lbl}</b><button class="btn sec sm" data-act="week" data-d="1">Después ▶</button></div>`;
+  for(let i=0;i<7;i++){
+    const d=addDays(ws,i);
+    h+=`<div class="card ${d===t?'today-card':''}"><div class="dayhead"><h2>${nice(d)}${d===t?' · <span style="color:var(--pri)">Hoy</span>':''}</h2></div>${mealRows(d)}</div>`;
+  }
+  h+=`<button class="btn sec block" data-act="weekToShop">🛒 Pasar ingredientes de esta semana a Compras</button>`;
+  h+=`<button class="btn sec block" data-act="copyWeek">📋 Copiar el menú de la semana anterior</button>`;
+  return h;
+}
+
+function vCompras(){
+  const falta=S.shop.filter(s=>!s.done), ya=S.shop.filter(s=>s.done);
+  let h=`<div class="card"><h2>🛒 Por comprar (${falta.length})</h2><form class="add" data-form="addShop"><input type="text" name="t" placeholder="Ej: 1 kg de arroz" autocomplete="off"><button class="btn">＋</button></form>`;
+  h+=falta.length?falta.map(s=>`<div class="item"><input type="checkbox" class="chk" data-act="shopToggle" data-id="${s.id}"><span class="txt" data-act="editShop" data-id="${s.id}">${esc(s.text)}</span><button class="ibtn" data-act="delShop" data-id="${s.id}">🗑️</button></div>`).join(''):'<div class="empty-msg">La lista está vacía.</div>';
+  h+='</div>';
+  if(falta.length)h+=`<button class="btn block" data-act="shareShop" style="margin:0 0 14px">📤 Enviar lista por WhatsApp</button>`;
+  if(ya.length){
+    h+=`<div class="card"><h2>✔️ Ya en la bolsa (${ya.length})</h2>`+ya.map(s=>`<div class="item done"><input type="checkbox" class="chk" checked data-act="shopToggle" data-id="${s.id}"><span class="txt">${esc(s.text)}</span></div>`).join('')+`<button class="btn warn block" data-act="clearShop">Borrar lo ya comprado</button></div>`;
+  }
+  return h;
+}
+
+function vPend(){
+  const p=pendientes(), t=today();
+  let h='';
+  if(!p.length)h+=`<div class="ok card">🎉 <b>¡Todo al día!</b><br>No tienes nada pendiente de días anteriores.</div>`;
+  else{
+    h+=`<div class="alert">Estas cosas <b>no se marcaron</b> como hechas. Puedes marcarlas, pasarlas a hoy o tocarlas para cambiarlas.</div>`;
+    h+=`<button class="btn block" data-act="allToday" style="margin:0 0 14px">Pasar todas a hoy (${p.length})</button>`;
+    const groups={};p.forEach(x=>(groups[x.date]=groups[x.date]||[]).push(x));
+    Object.keys(groups).forEach(d=>{h+=`<div class="card"><h2>📅 ${rel(d)}</h2>${groups[d].map(x=>itemTask(x,'pend')).join('')}</div>`});
+  }
+  h+=`<div class="card"><h2>📊 Cómo me fue esta semana</h2>`;
+  for(let i=6;i>=0;i--){
+    const d=addDays(t,-i), l=S.tasks.filter(x=>x.date===d), dn=l.filter(x=>x.done).length, pc=l.length?Math.round(dn/l.length*100):0;
+    h+=`<div class="statrow"><span>${i===0?'Hoy':i===1?'Ayer':DIAS[parse(d).getDay()]}</span><div class="bar"><i style="width:${pc}%"></i></div><span>${dn}/${l.length}</span></div>`;
+  }
+  return h+'</div>';
+}
+
+function dayChips(sel){return `<div class="chips">${[1,2,3,4,5,6,0].map(i=>`<label><input type="checkbox" name="d" value="${i}" ${sel.includes(i)?'checked':''}><span>${DIAS[i].slice(0,3)}</span></label>`).join('')}</div>`}
+function vMas(){
+  let h=`<div class="card"><h2>🔁 Tareas fijas</h2><div class="muted" style="margin-bottom:8px">Cosas que se repiten (ej: "Regar plantas" lunes y jueves). Aparecen solas en esos días.</div>
+  <form data-form="addRoutine"><input type="text" name="t" placeholder="Nombre de la tarea" autocomplete="off"><label class="f">¿Qué días?</label>${dayChips([])}<button class="btn block">Agregar tarea fija</button></form>`;
+  h+=S.routines.map(r=>`<div class="item"><span class="txt">${esc(r.text)}<br><span class="muted">${r.days.length===7?'Todos los días':[1,2,3,4,5,6,0].filter(i=>r.days.includes(i)).map(i=>DIAS[i].slice(0,3)).join(', ')}</span></span><button class="ibtn" data-act="delRoutine" data-id="${r.id}">🗑️</button></div>`).join('');
+  h+='</div>';
+  h+=`<div class="card"><h2>🔠 Tamaño de letra</h2><div class="row" style="margin-top:0"><button class="btn ${S.grande?'sec':''}" data-act="font" data-v="0">Normal</button><button class="btn ${S.grande?'':'sec'}" data-act="font" data-v="1">Grande</button></div></div>`;
+  h+=`<div class="card"><h2>💾 Copia de seguridad</h2><div class="muted">Guarda tus datos en un archivo por si cambias de celular.</div><div class="row"><button class="btn sec" data-act="export">Guardar copia</button><button class="btn sec" data-act="import">Cargar copia</button></div><input type="file" id="fileIn" accept=".json,application/json" hidden></div>`;
+  h+=`<div class="card"><h2>🧹 Empezar de cero</h2><button class="btn warn block" data-act="reset">Borrar todos mis datos</button></div>`;
+  h+=`<p class="muted" style="text-align:center">Casa en Orden · versión 0.1 de prueba</p>`;
+  return h;
+}
+
+const VIEWS={hoy:vHoy,menu:vMenu,compras:vCompras,pend:vPend,mas:vMas};
+const TITLES={hoy:'Mi día',menu:'Menú de la semana',compras:'Lista de compras',pend:'Lo que no hice',mas:'Más opciones'};
+function render(){
+  document.body.classList.toggle('grande',!!S.grande);
+  document.getElementById('htitle').textContent=TITLES[tab];
+  document.getElementById('hsub').textContent=nice(today());
+  document.getElementById('main').innerHTML=VIEWS[tab]();
+  const pn=pendientes().length, sn=S.shop.filter(s=>!s.done).length;
+  document.querySelectorAll('nav button').forEach(b=>{
+    b.classList.toggle('on',b.dataset.tab===tab);
+    b.querySelector('.badge')?.remove();
+    const n=b.dataset.tab==='pend'?pn:b.dataset.tab==='compras'?sn:0;
+    if(n)b.insertAdjacentHTML('beforeend',`<span class="badge">${n}</span>`);
+  });
+}
+function go(t){tab=t;if(t==='hoy')selDate=today();render();scrollTo(0,0)}
+
+// ---------- ventana de edición ----------
+function modal(title,body,onSave,extra=''){
+  const w=document.getElementById('modal');
+  w.innerHTML=`<div class="sheet"><h2>${title}</h2><form id="mf">${body}<div class="row"><button type="button" class="btn sec" data-close>Cancelar</button><button class="btn">Guardar</button></div>${extra}</form></div>`;
+  w.hidden=false;
+  const f=w.querySelector('#mf');
+  f.onsubmit=e=>{e.preventDefault();if(onSave(f)!==false){closeModal();save();render()}};
+  w.querySelectorAll('[data-close]').forEach(b=>b.onclick=closeModal);
+  w.onclick=e=>{if(e.target===w)closeModal()};
+  return f;
+}
+function closeModal(){const w=document.getElementById('modal');w.hidden=true;w.innerHTML=''}
+
+function editTask(id){
+  const t=task(id);if(!t)return;
+  const f=modal('✏️ Cambiar tarea',`<label class="f">¿Qué hay que hacer?</label><input type="text" name="t" value="${esc(t.text)}"><label class="f">¿Para qué día?</label><input type="date" name="d" value="${t.date}">`,
+    f=>{const v=f.t.value.trim();if(!v)return false;t.text=v;t.date=f.d.value||t.date},
+    `<button type="button" class="btn warn block" id="mdel">🗑️ Borrar esta tarea</button>`);
+  f.querySelector('#mdel').onclick=()=>{S.tasks=S.tasks.filter(x=>x.id!==id);closeModal();save();render();toast('Tarea borrada')};
+}
+function editMeal(date,k){
+  const cur=(S.menu[date]||{})[k]||{};
+  const label=COMIDAS.find(c=>c[0]===k)[1];
+  const opts=Object.keys(S.dishes).sort().map(n=>`<option value="${esc(n)}">`).join('');
+  const f=modal(`${label} · ${rel(date)}`,`<label class="f">¿Qué vas a cocinar?</label><input type="text" name="n" list="dl" value="${esc(cur.name)}" placeholder="Ej: Arroz con pollo" autocomplete="off"><datalist id="dl">${opts}</datalist>
+    <label class="f">Ingredientes que necesitas (separados por coma)</label><textarea name="i" placeholder="Ej: pollo, arroz, arvejas, zanahoria">${esc(cur.ing)}</textarea>
+    <label style="display:flex;gap:8px;align-items:center;margin-top:10px;font-size:.9em"><input type="checkbox" name="s" class="chk" style="width:24px;height:24px"> Agregar ingredientes a la lista de compras</label>`,
+    f=>{
+      const n=f.n.value.trim(), i=f.i.value.trim();
+      S.menu[date]=S.menu[date]||{};
+      if(!n&&!i)delete S.menu[date][k];else S.menu[date][k]={name:n,ing:i};
+      if(n)S.dishes[n]=i||S.dishes[n]||'';
+      if(f.s.checked&&i){const c=addToShop(i.split(/[,\n]/));toast(c?`${c} ingrediente(s) agregados a Compras`:'Ya estaban en Compras')}
+    },
+    cur.name?`<button type="button" class="btn warn block" id="mclr">Quitar esta comida</button>`:'');
+  f.n.addEventListener('input',()=>{const d=S.dishes[f.n.value.trim()];if(d&&!f.i.value.trim())f.i.value=d});
+  f.querySelector('#mclr')?.addEventListener('click',()=>{delete S.menu[date][k];closeModal();save();render()});
+}
+function editShop(id){
+  const s=S.shop.find(x=>x.id===id);if(!s)return;
+  modal('✏️ Cambiar producto',`<input type="text" name="t" value="${esc(s.text)}">`,f=>{const v=f.t.value.trim();if(!v)return false;s.text=v});
+}
+
+// ---------- acciones ----------
+const ACT={
+  go:d=>go(d.tab),
+  day:d=>{selDate=d.date;render()},
+  toggle:(d,el)=>{const t=task(d.id);if(!t)return;t.done=el.checked;save();if(t.done)toast('¡Hecho! ✔');setTimeout(render,t.done?250:0)},
+  editTask:d=>editTask(d.id),
+  delTask:d=>{const t=task(d.id);if(t&&confirm('¿Borrar "'+t.text+'"?')){S.tasks=S.tasks.filter(x=>x.id!==d.id);save();render()}},
+  toToday:d=>{const t=task(d.id);if(t){t.date=today();save();render();toast('Pasada a hoy')}},
+  allToday:()=>{pendientes().forEach(t=>t.date=today());save();render();toast('Todo pasado a hoy')},
+  editMeal:d=>editMeal(d.date,d.k),
+  week:d=>{weekOffset+=Number(d.d);render()},
+  weekToShop:()=>{const ws=weekStart();let all=[];for(let i=0;i<7;i++){const m=S.menu[addDays(ws,i)]||{};Object.values(m).forEach(v=>v.ing&&all.push(...v.ing.split(/[,\n]/)))}
+    if(!all.length)return toast('No hay ingredientes anotados esta semana');const c=addToShop(all);save();render();toast(c?`${c} ingrediente(s) agregados a Compras`:'Ya estaban todos en Compras')},
+  copyWeek:()=>{const ws=weekStart();let n=0;for(let i=0;i<7;i++){const src=S.menu[addDays(ws,i-7)];if(src&&Object.keys(src).length){S.menu[addDays(ws,i)]=JSON.parse(JSON.stringify(src));n++}}
+    if(!n)return toast('La semana anterior está vacía');save();render();toast('Menú copiado')},
+  shopToggle:(d,el)=>{const s=S.shop.find(x=>x.id===d.id);if(s){s.done=el.checked;save();setTimeout(render,200)}},
+  editShop:d=>editShop(d.id),
+  delShop:d=>{S.shop=S.shop.filter(x=>x.id!==d.id);save();render()},
+  clearShop:()=>{S.shop=S.shop.filter(x=>!x.done);save();render()},
+  shareShop:()=>{const txt='🛒 Lista de compras:\n'+S.shop.filter(s=>!s.done).map(s=>'• '+s.text).join('\n');
+    if(navigator.share)navigator.share({text:txt}).catch(()=>{});else window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank')},
+  delRoutine:d=>{const r=S.routines.find(x=>x.id===d.id);if(r&&confirm('¿Borrar la tarea fija "'+r.text+'"? (las ya creadas se quedan)')){S.routines=S.routines.filter(x=>x.id!==d.id);save();render()}},
+  font:d=>{S.grande=d.v==='1';save();render()},
+  export:()=>{const b=new Blob([JSON.stringify(S,null,1)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='casa-en-orden-copia-'+today()+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)},
+  import:()=>{const fi=document.getElementById('fileIn');fi.onchange=()=>{const file=fi.files[0];if(!file)return;file.text().then(t=>{try{const o=JSON.parse(t);if(!o||!Array.isArray(o.tasks))throw 0;if(confirm('Esto reemplazará tus datos actuales. ¿Continuar?')){S=Object.assign(defaults(),o);save();render();toast('Copia cargada')}}catch(e){alert('Ese archivo no es una copia válida.')}})};fi.click()},
+  reset:()=>{if(confirm('¿Seguro? Se borrará TODO: tareas, menú y compras.')&&confirm('Última confirmación: ¿borrar todo?')){S=defaults();S.seeded=true;save();go('hoy')}}
+};
+const FORMS={
+  addTask:f=>{const v=f.t.value.trim();if(!v)return;S.tasks.push({id:uid(),text:v,date:selDate,done:false});save();render();document.querySelector('[data-form=addTask] input').focus()},
+  addShop:f=>{const v=f.t.value.trim();if(!v)return;S.shop.push({id:uid(),text:v,done:false});save();render();document.querySelector('[data-form=addShop] input').focus()},
+  addRoutine:f=>{const v=f.t.value.trim();const days=[...f.querySelectorAll('input[name=d]:checked')].map(x=>Number(x.value));
+    if(!v)return toast('Escribe el nombre de la tarea');if(!days.length)return toast('Elige al menos un día');
+    S.routines.push({id:uid(),text:v,days});save();genRoutines(today());render();toast('Tarea fija agregada')}
+};
+document.getElementById('main').addEventListener('click',e=>{const el=e.target.closest('[data-act]');if(el)ACT[el.dataset.act]?.(el.dataset,el,e)});
+document.getElementById('main').addEventListener('submit',e=>{const f=e.target.closest('[data-form]');if(f){e.preventDefault();FORMS[f.dataset.form](f)}});
+document.getElementById('nav').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(b)go(b.dataset.tab)});
+// si la app queda abierta y cambia el día
+let lastDay=today();
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&today()!==lastDay){lastDay=today();selDate=today();render()}});
+
+render();
+if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
